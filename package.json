@@ -7,7 +7,7 @@
     "build": "browserify src/main.js -o www/main.js",
     "watch": "watchify src/main.js -o www/main.js --debug --verbose ",
     "start": "http-server www -a 0.0.0.0 -S",
-    "start-server": "cd node_modules/rtcmulticonnection-server; node server.js",
+    "start-server": "cd node_modules/rtcmulticonnection-server; forever start server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -22,6 +22,7 @@
   "dependencies": {
     "array-smooth": "^1.0.0",
     "cubic-spline": "^3.0.3",
+    "forever": "^3.0.4",
     "http-server": "^0.12.1",
     "rtcmulticonnection": "^3.7.0",
     "rtcmulticonnection-server": "^1.3.2",

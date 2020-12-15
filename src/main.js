@@ -12,13 +12,17 @@ if ("serviceWorker" in navigator) {
 const SquidbackFilterBankProcess = require('./process/filterBankProcess.js')
 const RemoteStream = require('./remoteStream.js')
 
-async function init() {
+async function init(online=false) {
     const audioContext = new AudioContext()
     let process = new SquidbackFilterBankProcess(audioContext, document.querySelector("canvas#spectrum"));
     await process.start(2048)
 
-    let remote = new RemoteStream(audioContext);
-    remote.connect(process.output, process.input)
+    if (online) {
+        let remote = new RemoteStream(audioContext);
+        remote.connect(process.output, process.input, "squidback", ()=>{
+            updateRemoteGui(remote)
+        }) 
+    }
 
     window.addEventListener('resize', ()=>{
         resizeAllCanvas();
@@ -29,29 +33,37 @@ async function init() {
     // await process.start(512)
 }
 
-function resize(canvas) {
-  // Lookup the size the browser is displaying the canvas.
-  var displayWidth  = canvas.clientWidth;
-  var displayHeight = canvas.clientHeight;
- 
-  // Check if the canvas is not the same size.
-  if (canvas.width  != displayWidth ||
-      canvas.height != displayHeight) {
- 
-    // Make the canvas the same size
-    canvas.width  = displayWidth;
-    canvas.height = displayHeight;
-  }
-}
 
 function resizeAllCanvas() {
-    document.querySelectorAll("canvas").forEach(canvas=>resize(canvas))
+    document.querySelectorAll("canvas").forEach(canvas=>{
+      const {clientWidth, clientHeight} = canvas;
+     
+      if (canvas.width  != clientWidth || canvas.height != clientHeight) {
+        canvas.width  = clientWidth; canvas.height = clientHeight;
+      }
+    })
+}
+
+let remoteGuiInterval;
+function updateRemoteGui(remote) {
+    const container = document.querySelector("#remoteGui")
+    const statusElement = document.querySelector("#remoteStatus")
+    const counterElement = document.querySelector("#remotePeerCounter")
+
+    if (remote.isConnected) { statusElement.innerText = "Online"; statusElement.classList.add("online") }
+    else { statusElement.innerText = "Offline"; statusElement.classList.remove("online") }
+
+    counterElement.innerText = `(${remote.peerCount})`
+
+    container.classList.add("visible")
+    if(remoteGuiInterval) clearTimeout(remoteGuiInterval)
+    setTimeout(()=>container.classList.remove("visible"), 2500)
 }
 
 window.addEventListener('load', ()=>{
     const button = document.querySelector("button#start")
     button.addEventListener("click", ()=>{
-        init();
+        init(true);
         button.classList.add("started")
         document.body.requestFullscreen()
     });
