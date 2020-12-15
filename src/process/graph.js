@@ -40,10 +40,9 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawFreqFFT(selector, data, min, max, color="rgba(255,255,255,0.5)", cacheId, fill=true, inverted = false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
-        
+    drawFreqFFT(data, min, max, color="rgba(255,255,255,0.5)", cacheId, fill=true, inverted = false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
+
         canvasCtx.beginPath();
         canvasCtx.moveTo(0, canvas.height * (1-inverted));
         let init = false;
@@ -113,18 +112,15 @@ class SquidbackGraph {
         canvasCtx.closePath();
     }
 
-    drawBg(selector, color) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
-        canvasCtx.beginPath();
-        canvasCtx.fillStyle = color;
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.closePath();
+    drawBg(color) {
+        this.canvasCtx.beginPath();
+        this.canvasCtx.fillStyle = color;
+        this.canvasCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.canvasCtx.closePath();
     }
 
-    drawGain(selector, color, amp=0, min=0, max=1) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawGain(color, amp=0, min=0, max=1) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
         const gainHeight = (20 * Math.log10(amp) - min) / (max-min);
         //console.log(amp, gainHeight, min, max)
         canvasCtx.beginPath();
@@ -164,9 +160,8 @@ class SquidbackGraph {
         this.canvasCtx.stroke();
     }
 
-    drawLinVerticals(selector, numPoints, data, color="rgba(255,255,255,0.005)") {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawLinVerticals(numPoints, data, color="rgba(255,255,255,0.005)") {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
         const barWidth = (canvas.width / (data.length - 1));
         canvasCtx.beginPath();
         canvasCtx.fillStyle = color;
@@ -177,9 +172,9 @@ class SquidbackGraph {
         canvasCtx.closePath();
     }
 
-    drawSmoothLine(selector, data, min, max, color="rgba(255,255,255,1)", upsample=5, inverted=false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawSmoothLine(data, min, max, color="rgba(255,255,255,1)", upsample=5, inverted=false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
+
         data = new Spline([...data.keys()], data);
 
         canvasCtx.beginPath();
@@ -203,9 +198,8 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawSmoothLineDB(selector, data, min, max, color="rgba(255,255,255,0.5)",  freqs, upsample = 3, inverted = false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawSmoothLineDB(data, min, max, color="rgba(255,255,255,0.5)",  freqs, upsample = 3, inverted = false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
 
         // xMin *= canvas.width; xMax *= canvas.width;
         const xMin = Math.log(freqs[0]/40) / Math.log(500) * canvas.width 
@@ -235,9 +229,8 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawSmoothLineInverted(selector, data, min, max, color="rgba(255,255,255,0.5)",  xMin=0, xMax=1, upsample = 3) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawSmoothLineInverted(data, min, max, color="rgba(255,255,255,0.5)",  xMin=0, xMax=1, upsample = 3) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
 
         xMin *= canvas.width; xMax *= canvas.width;
 
@@ -287,12 +280,12 @@ class SquidbackGraph {
 
     clearCache() { this.cache = {} }
 
-    drawLogLineInverted(selector, data, min, max, color="rgba(255,255,255,0.5)", cacheId){
-        this.drawLogLine(selector, data, min, max, color, cacheId, true)
+    drawLogLineInverted(data, min, max, color="rgba(255,255,255,0.5)", cacheId){
+        this.drawLogLine(data, min, max, color, cacheId, true)
     }
-    drawLogLine(selector, data, min, max, color="rgba(255,255,255,0.5)", cacheId, inverted = false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawLogLine(data, min, max, color="rgba(255,255,255,0.5)", cacheId, inverted = false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
+
         const xs = this.getXs(canvas.width, data.length, 1, cacheId);
 
         canvasCtx.beginPath();
@@ -311,12 +304,11 @@ class SquidbackGraph {
     }
 
 
-    drawSmoothLogLineInverted(selector, data, min, max, color="rgba(255,255,255,0.5)", upsample = 3, cacheId) {
-        this.drawSmoothLogLine(selector, data, min, max, color, upsample, cacheId, true)
+    drawSmoothLogLineInverted(data, min, max, color="rgba(255,255,255,0.5)", upsample = 3, cacheId) {
+        this.drawSmoothLogLine(data, min, max, color, upsample, cacheId, true)
     }
-    drawSmoothLogLine(selector, data, min, max, color="rgba(255,255,255,0.5)", upsample = 3, cacheId, inverted = false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawSmoothLogLine(data, min, max, color="rgba(255,255,255,0.5)", upsample = 3, cacheId, inverted = false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
 
         data = new Spline([...data.keys()], data);
         const inc = 1/upsample;
@@ -336,12 +328,11 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawAvgLogLineInverted(selector, data, min, max, color="rgba(255,255,255,0.5)", smoothWindow = 3, cacheId) {
-        this.drawAvgLogLine(selector, data, min, max, color, smoothWindow, cacheId, true)
+    drawAvgLogLineInverted(data, min, max, color="rgba(255,255,255,0.5)", smoothWindow = 3, cacheId) {
+        this.drawAvgLogLine(data, min, max, color, smoothWindow, cacheId, true)
     }
-    drawAvgLogLine(selector, data, min, max, color="rgba(255,255,255,0.5)", smoothWindow = 3, cacheId, inverted = false) {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawAvgLogLine(data, min, max, color="rgba(255,255,255,0.5)", smoothWindow = 3, cacheId, inverted = false) {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
 
         data = smooth(data, smoothWindow);
         const xs = this.getXs(canvas.width, data.length, 1, cacheId)
@@ -363,9 +354,8 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawVerticals(selector, numPoints, data, color="rgba(255,255,255,0.5)") {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawVerticals(numPoints, data, color="rgba(255,255,255,0.5)") {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
         //const logIToX = canvas.width / Math.log(data.length - 1);
         const logIToX = canvas.width / Math.log(/*len - 1*/500)
 
@@ -387,9 +377,9 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
-    drawHLine(selector, h, min, max, color="rgba(255,255,255,0.5)") {
-        const canvas = document.querySelector(selector);
-        const canvasCtx = canvas.getContext("2d");
+    drawHLine(h, min, max, color="rgba(255,255,255,0.5)") {
+        const canvas = this.canvas; const canvasCtx = this.canvasCtx
+
         const y = canvas.height * (1 - (h - min) / (max-min));
         canvasCtx.beginPath();
         canvasCtx.moveTo(0, y);

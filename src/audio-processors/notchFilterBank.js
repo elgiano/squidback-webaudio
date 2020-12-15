@@ -1,27 +1,21 @@
-const {calculateQs, chromaticFilter} = require('../scales.js')
-
 class NotchFilterBank {
     constructor(audioContext, scale, q) {
         this.audioContext = audioContext
-        if(!scale) {
-            const scaleObj = chromaticFilter();
-            scale = scaleObj.scale;
-            q = scaleObj.qs;
-        }
         this.scale = scale;
+        this.q = q; 
         this.filters = [];
 
-        this.q = q || calculateQs(this.scale); //console.log(q);
+        //|| calculateQs(this.scale); //console.log(q);
 
         this.makeFiltersFromScale(this.scale, this.q);
     }
 
-    makeFiltersFromScale(scale, q) {
+    makeFiltersFromScale() {
         this.scale.forEach((freq,i)=>{
           const filter = this.audioContext.createBiquadFilter();
           filter.type = "peaking"; filter.frequency.setValueAtTime(freq, this.audioContext.currentTime);
           filter.gain.value = 1;
-          filter.Q.value = typeof q == 'object' ? q[i] : q ;
+          filter.Q.value = typeof this.q == 'object' ? this.q[i] : this.q ;
           this.filters.push(filter);
         })
 

@@ -1,6 +1,9 @@
-const SquidbackGraph = require('../graph.js')
+const SquidbackGraph = require('./graph.js')
 const { AutoGain, MagnitudesHistory } = require("../audio-processors/index.js")
 
+// this class is here because I've been experimenting with different processes
+// (notably one where I attempted to filter by iffting a correction spectrum to time domain and convolving it to the signal
+// which was computationally cheap but didn't work well sound-wise)
 class SquidbackCommonProcess {
 
     // subclass responsibilites
@@ -66,7 +69,6 @@ class SquidbackCommonProcess {
         const minBin = minFreq / this.binToFreq;
         const maxBin = maxFreq / this.binToFreq;
         this.minFilterBin = Math.round(minBin); this.maxFilterBin = Math.round(maxBin);
-        console.log(minFreq, maxFreq, this.binToFreq, this.filterGraphOffsetL, this.filterGraphOffsetR)
         this.graph.setupFreqAxis(minFreq, maxFreq, this.binToFreq)
     }
 
@@ -112,6 +114,8 @@ class SquidbackCommonProcess {
 
     // draw graphs
 
+    // draw modularly, call every function in this.drawFunction
+    // intended to implement gui options to enable/disable graphs
     draw() {
         const smooth = 0.1;
         this.minDb = smooth * this.minDb + (1-smooth)*(this.anal.minDb - 50);
@@ -123,7 +127,7 @@ class SquidbackCommonProcess {
     }
 
     drawBg() {
-        Graph.drawBg("canvas#spectrum", 'rgba(0,0,0,0.5)')
+        this.graph.drawBg('rgba(0,0,0,0.5)')
     }
 
     findPitch() {
@@ -138,56 +142,38 @@ class SquidbackCommonProcess {
 
     drawColorBg() {
         const [pitch, amp] = this.findPitch();
-        /*const bgColor = this.anal.peakFinder.nbPeaks > 0 ? Graph.pitchAmpToHSLA(pitch, amp) : 'rgba(100,100,100,0.3)';
-        this.graph.drawBg("canvas#spectrum", bgColor)*/
-        this.graph.drawBg("canvas#spectrum", this.graph.pitchAmpToHSLA(pitch, amp))
-
+        const bgColor = this.graph.pitchAmpToHSLA(pitch, amp);
+        this.graph.drawBg(bgColor)
     }
 
     drawGain() {
-        this.graph.drawGain("canvas#spectrum", "red", this.autoGain.getCurrentValue(), 0, 100);
+        this.graph.drawGain("red", this.autoGain.getCurrentValue(), 0, 100);
     }
 
     drawInputSpectrum(opts) {
-        this.graph.drawLogLine("canvas#spectrum", this.fftBuffer, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 1);
+        this.graph.drawLogLine(this.fftBuffer, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 1);
     }
     drawInputSpectrumSmooth(opts) {
-        this.graph.drawAvgLogLine("canvas#spectrum", this.fftBuffer, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 3, 2);
+        this.graph.drawAvgLogLine(this.fftBuffer, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 3, 2);
     }
     drawOutputSpectrum(opts) {
-        this.graph.drawLogLine("canvas#spectrum", this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 1);
+        this.graph.drawLogLine(this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 1);
     }
     drawOutputSpectrumSmooth(opts) {
-        this.graph.drawAvgLogLine("canvas#spectrum", this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 3, 2);
+        this.graph.drawAvgLogLine(this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 3, 2);
     }
 
     drawStatLines(opts) {
-        this.graph.drawHLine("canvas#spectrum",  this.anal.averageDb, opts.minDb, opts.maxDb, "green");
-        this.graph.drawHLine("canvas#spectrum", this.anal.maxDb, opts.minDb, opts.maxDb, "red");
-        this.graph.drawHLine("canvas#spectrum", this.anal.peakThr, opts.minDb, opts.maxDb, "blue");
+        this.graph.drawHLine(this.anal.averageDb, opts.minDb, opts.maxDb, "green");
+        this.graph.drawHLine(this.anal.maxDb, opts.minDb, opts.maxDb, "red");
+        this.graph.drawHLine(this.anal.peakThr, opts.minDb, opts.maxDb, "blue");
     }
 
     drawPeaks() {
-        this.graph.drawLinVerticals("canvas#spectrum", this.anal.peakFinder.nbPeaks, this.anal.peakFinder.peakIndexes)
+        this.graph.drawLinVerticals(this.anal.peakFinder.nbPeaks, this.anal.peakFinder.peakIndexes)
     }
     drawFbs() {
-        this.graph.drawVerticals("canvas#spectrum", this.numFb, this.fbBuffer, "rgba(255,0,0,0.5)")
-    }
-
-    drawMagReductionsSmooth(opts) {
-        this.graph.drawSmoothLogLineInverted("canvas#spectrum", this.anal.magReductions, opts.minDb, opts.maxDb, "rgba(0,0,0,0.5)");
-    }
-    drawMagReductions(opts) {
-        this.graph.drawLogLineInverted("canvas#spectrum", this.anal.magReductions, opts.minDb, opts.maxDb, "rgba(0,0,0,0.3)");
-        //this.graph.drawLogLine("canvas#spectrum", this.anal.magReductionsAmp, 0, 1, "rgba(0,255,0,0.5)");
-    }
-    drawMagReductionsAmp() {
-        this.graph.drawLogLine("canvas#spectrum", this.anal.magReductionsAmp, 0, 1, "rgba(0,255,0,0.5)");
-    }
-
-    drawSlope(opts) {
-        this.graph.drawBg("canvas#slope", "white")
-        //this.graph.drawLogLine("canvas#slope", this.freqResponse, -100, 0, "rgba(255,0,0,1)");
+        this.graph.drawVerticals(this.numFb, this.fbBuffer, "rgba(255,0,0,0.5)")
     }
 
     clearGraphCache() { this.graph.clearCache() }

@@ -1,16 +1,10 @@
 "use strict";
 
-//const SquidbackWorkletProcess = require('./worklet/workletProcess.js')
-// const SquidbackFFTProcess = require('./process/fftProcess.js')
 const SquidbackFilterBankProcess = require('./process/filterBankProcess.js')
 const RemoteStream = require('./remoteStream.js')
 
 async function init() {
     const audioContext = new AudioContext()
-    if (audioContext.audioWorklet === undefined) {
-        handleNoWorklet();
-        return;
-    }
     let process = new SquidbackFilterBankProcess(audioContext, document.querySelector("canvas#spectrum"));
     await process.start(2048)
 
@@ -24,15 +18,6 @@ async function init() {
 
     // let process = new SquidbackFFTProcess(audioContext);
     // await process.start(512)
-}
-
-function handleNoWorklet() {
-    let $noWorklet = document.querySelector("#no-worklet");
-    $noWorklet.style.display = 'block';
-    let $timeline = document.querySelector(".timeline");
-    $timeline.style.display = 'none';
-    let $controls = document.querySelector(".controls");
-    $controls.style.display = 'none';
 }
 
 function resize(canvas) {
@@ -53,7 +38,6 @@ function resize(canvas) {
 function resizeAllCanvas() {
     document.querySelectorAll("canvas").forEach(canvas=>resize(canvas))
 }
-
 
 window.addEventListener('load', ()=>{
     const button = document.querySelector("button#start")
