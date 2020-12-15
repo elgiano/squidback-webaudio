@@ -18,8 +18,7 @@ class RemoteStream {
         // this.connection.socketURL = '/';
 
         // comment-out below line if you do not have your own socket.io server
-        this.connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
-        this.connection.socketMessageEvent = 'audio-conference-demo';
+        this.connection.socketURL = 'https://squidback.xyz:443/';
         this.connection.session = { audio: true, video: false };
         this.connection.mediaConstraints = { audio: { noiseSuppression: false, echoCancellation: false, autoGainControl: false }, video: false };
         this.connection.sdpConstraints.mandatory = { OfferToReceiveAudio: true, OfferToReceiveVideo: false };
