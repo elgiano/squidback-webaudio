@@ -43,7 +43,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         .connect(this.output)
         .connect(this.audioContext.destination)
 
-        this.filterBank.connect(this.outFftNode)
+        //this.filterBank.connect(this.outFftNode)
         //this.input.connect(this.output).connect(this.audioContext.destination)
     }
 
@@ -57,19 +57,22 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
     updateSpectrum() {
         //this.fftNode.getFloatFrequencyData(this.fftBuffer);
         this.fftNode.getByteFrequencyData(this.fftBuffer);
-        this.outFftNode.getFloatFrequencyData(this.outFftBuffer);
+        //this.outFftNode.getFloatFrequencyData(this.outFftBuffer);
         this.maxDb = this.fftNode.maxDecibels;
         this.minDb = this.fftNode.minDecibels;
-        this.anal.analyseSpectrum(this.fftBuffer, this.minDb, this.maxDb);
 
-        // this.filterGains = this.mel.filterSpectrum(this.anal.magReductions);
-        this.filterBank.setGains(this.anal.magReductions);
-        this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
-        const correctionBaselineAmp = Math.max(...this.freqResponse);
+        this.anal.analyseSpectrum(this.fftBuffer, this.minDb, this.maxDb);
+        const correctionBaselineAmp = this.findCorrectionBaseline();
         this.anal.normalizeReductions(correctionBaselineAmp);
         this.filterGains = this.anal.magReductions;
         this.filterBank.setGains(this.filterGains);
         this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
+    }
+
+    findCorrectionBaseline() {
+        this.filterBank.setGains(this.anal.magReductions);
+        this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
+        return Math.max(...this.freqResponse);
     }
 
     // graphs

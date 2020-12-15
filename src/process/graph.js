@@ -73,7 +73,7 @@ class SquidbackGraph {
         const canvas = this.canvas;
         const canvasCtx = this.canvasCtx;
 
-        const barWidth = canvas.width / (data.length * upsample);
+        const barWidth = canvas.width / (data.length - 1) / upsample;
         let barHeight;
         data = new Spline([...data.keys()], data);
         canvasCtx.beginPath();
@@ -83,7 +83,7 @@ class SquidbackGraph {
         barHeight = (val - min) / (max-min) * canvas.height;
         canvasCtx.lineTo(0, canvas.height - barHeight);
         const inc = 1/upsample;
-        for(let i = 0; i < (data.ys.length); i+=inc){
+        for(let i = 0; i < data.ys.length-1; i+=inc){
             val = 20 * Math.log10(data.at(i));
             barHeight = (val - min) / (max-min) * canvas.height;
             x += barWidth;

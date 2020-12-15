@@ -53,9 +53,8 @@ class SquidbackCommonProcess {
     initBuffers(minFreq, maxFreq) {
         const numBins = this.numBins;
         this.fftBuffer = new Uint8Array(numBins);
-        this.outFftBuffer = new Float32Array(numBins);
-        this.fbBuffer = new Int32Array(numBins);
-        this.numFb = 0;
+        //this.outFftBuffer = new Float32Array(numBins);
+        //this.fbBuffer = new Int32Array(numBins);
 
         this.maxDb = -180;
     }
@@ -90,9 +89,9 @@ class SquidbackCommonProcess {
         this.fftNode.fftSize = fftSize;
         this.fftNode.smoothingTimeConstant = 0.9;
 
-        this.outFftNode = this.audioContext.createAnalyser();
+        /*this.outFftNode = this.audioContext.createAnalyser();
         this.outFftNode.fftSize = this.fftNode.fftSize;
-        this.outFftNode.smoothingTimeConstant = this.fftNode.smoothingTimeConstant;
+        this.outFftNode.smoothingTimeConstant = this.fftNode.smoothingTimeConstant;*/
 
         this.fftSize = fftSize;
         this.numBins = this.fftNode.frequencyBinCount;
@@ -156,12 +155,12 @@ class SquidbackCommonProcess {
     drawInputSpectrumSmooth(opts) {
         this.graph.drawAvgLogLine(this.fftBuffer, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 3, 2);
     }
-    drawOutputSpectrum(opts) {
+    /*drawOutputSpectrum(opts) {
         this.graph.drawLogLine(this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 1);
     }
     drawOutputSpectrumSmooth(opts) {
         this.graph.drawAvgLogLine(this.outFftBuffer, opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 3, 2);
-    }
+    }*/
 
     drawStatLines(opts) {
         this.graph.drawHLine(this.anal.averageDb, opts.minDb, opts.maxDb, "green");
@@ -171,9 +170,6 @@ class SquidbackCommonProcess {
 
     drawPeaks() {
         this.graph.drawLinVerticals(this.anal.peakFinder.nbPeaks, this.anal.peakFinder.peakIndexes)
-    }
-    drawFbs() {
-        this.graph.drawVerticals(this.numFb, this.fbBuffer, "rgba(255,0,0,0.5)")
     }
 
     clearGraphCache() { this.graph.clearCache() }
