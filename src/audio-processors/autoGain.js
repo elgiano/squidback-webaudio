@@ -1,8 +1,9 @@
 class AutoGain {
     constructor(audioContext) {
-        this.gainIncrement = 0.05;
-        this.gainDecrement = 0.05;
-        this.desiredLevel = -20;
+        this.gainIncrement = 0.05 / 100;
+        this.gainDecrement = 0.05 / 100;
+        this.desiredLevel = -40;
+        this.tolerance = 5;
         this.maxGain = 20;
         this.minGain = -20;
 
@@ -13,7 +14,7 @@ class AutoGain {
         this.limiter.attack.value = 0.001
         this.limiter.release.value = 0.01
 
-        this.smoothing = 0.99;
+        this.smoothing = 0//0.99;
 
         this.now = ()=>audioContext.currentTime
     }
@@ -23,13 +24,11 @@ class AutoGain {
         const currentGain = this.getCurrentValueDb();
         this.gain.gain.cancelScheduledValues(this.now())
         let nextGain = currentGain;
-        if(maxDb > this.desiredLevel) {
-            nextGain += (this.desiredLevel - maxDb) * this.gainDecrement
-        } else {
-            nextGain += (this.desiredLevel - maxDb) * this.gainIncrement
-        }
+        const diff = this.desiredLevel - maxDb
+        if(Math.abs(diff) > this.tolerance)
+            nextGain += diff * (diff > 0 ? this.gainIncrement : this.gainDecrement)
 
-        // console.log(maxDb, this.desiredLevel, currentGain, nextGain)
+        console.log(maxDb, this.desiredLevel, diff, nextGain)
         nextGain = this.smoothing * currentGain + (1-this.smoothing) * nextGain
 
         if(nextGain != currentGain) {
