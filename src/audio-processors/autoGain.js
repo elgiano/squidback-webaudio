@@ -1,11 +1,10 @@
 class AutoGain {
     constructor(audioContext) {
-        this.gainIncrement = 0.001;
-        this.gainDecrement = 0.001;
-        this.minVolume = -40;
-        this.maxVolume = -10;
-        this.maxGain = 100;
-        this.minGain = -100;
+        this.gainIncrement = 0.05;
+        this.gainDecrement = 0.05;
+        this.desiredLevel = -20;
+        this.maxGain = 20;
+        this.minGain = -20;
 
         this.gain = audioContext.createGain();
         this.limiter = audioContext.createDynamicsCompressor()
@@ -14,20 +13,25 @@ class AutoGain {
         this.limiter.attack.value = 0.001
         this.limiter.release.value = 0.01
 
+        this.smoothing = 0.99;
+
         this.now = ()=>audioContext.currentTime
     }
 
     updateGain(maxDb) {
         if(maxDb <= -180) return
-        const currentGain = 20 * Math.log10(this.gain.gain.value);
+        const currentGain = this.getCurrentValueDb();
         this.gain.gain.cancelScheduledValues(this.now())
-
         let nextGain = currentGain;
-        if(maxDb > this.maxVolume) {
-            nextGain += (this.minVolume - maxDb) * this.gainDecrement
+        if(maxDb > this.desiredLevel) {
+            nextGain += (this.desiredLevel - maxDb) * this.gainDecrement
         } else {
-            nextGain += (this.maxVolume - maxDb) * this.gainIncrement
+            nextGain += (this.desiredLevel - maxDb) * this.gainIncrement
         }
+
+        console.log(maxDb, this.desiredLevel, currentGain, nextGain)
+        nextGain = this.smoothing * currentGain + (1-this.smoothing) * nextGain
+
         if(nextGain != currentGain) {
             if(this.isGainValid(nextGain)) {
                 nextGain = Math.pow(10, nextGain*0.05);
@@ -41,6 +45,7 @@ class AutoGain {
     }
 
     getCurrentValue() { return this.gain.gain.value }
+    getCurrentValueDb() { return 20 * Math.log10(this.gain.gain.value) }
     connect(destination) { return this.gain.connect(this.limiter).connect(destination) }
 }
 

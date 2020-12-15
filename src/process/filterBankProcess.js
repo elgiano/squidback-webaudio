@@ -31,13 +31,13 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         if(this.inputDevice) this.inputDevice.connect(this.input)
 
         const signal = this.input
-        //.connect(this.autoGain.gain)
         .connect(this.hipass)
         .connect(this.lopass)
 
         signal.connect(this.fftNode)
 
         this.filterBank.connectInput(signal)
+        .connect(this.autoGain.gain)
         .connect(this.autoGain.limiter)
         .connect(this.panner)
         .connect(this.output)
@@ -50,7 +50,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
     update(){
         requestAnimationFrame(()=>this.update())
         this.updateSpectrum();
-        this.autoGain.updateGain(this.anal.maxDb);
+        this.autoGain.updateGain(this.currentVolume);
         this.draw();
     }
 
@@ -58,10 +58,8 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         //this.fftNode.getFloatFrequencyData(this.fftBuffer);
         this.fftNode.getByteFrequencyData(this.fftBuffer);
         //this.outFftNode.getFloatFrequencyData(this.outFftBuffer);
-        this.maxDb = this.fftNode.maxDecibels;
-        this.minDb = this.fftNode.minDecibels;
-
-        this.anal.analyseSpectrum(this.fftBuffer, this.minDb, this.maxDb);
+        this.anal.analyseSpectrum(this.fftBuffer, this.fftNode.minDecibels, this.fftNode.maxDecibels);
+        this.currentVolume = this.anal.maxDb;// - this.numBinsDb;
         const correctionBaselineAmp = this.findCorrectionBaseline();
         this.anal.normalizeReductions(correctionBaselineAmp);
         this.filterGains = this.anal.magReductions;

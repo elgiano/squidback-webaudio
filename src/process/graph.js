@@ -119,13 +119,14 @@ class SquidbackGraph {
         this.canvasCtx.closePath();
     }
 
-    drawGain(color, amp=0, min=0, max=1) {
+    drawGain(color, db=0, min=0, max=1) {
         const canvas = this.canvas; const canvasCtx = this.canvasCtx
-        const gainHeight = (20 * Math.log10(amp) - min) / (max-min);
-        //console.log(amp, gainHeight, min, max)
+        const gainHeight = db / (db < 0 ? (-min) : max) * canvas.height / 2;
         canvasCtx.beginPath();
+        canvasCtx.fillStyle = "rgba(30%,30%,30%,1)";
+        canvasCtx.fillRect(canvas.width-2, 0, 2, canvas.height);
         canvasCtx.fillStyle = color;
-        canvasCtx.fillRect(canvas.width-2, canvas.height, canvas.width, -canvas.height * gainHeight);
+        canvasCtx.fillRect(canvas.width-2, canvas.height / 2, 2,  - gainHeight);
         canvasCtx.closePath();
     }
 

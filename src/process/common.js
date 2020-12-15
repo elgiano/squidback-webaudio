@@ -56,7 +56,8 @@ class SquidbackCommonProcess {
         //this.outFftBuffer = new Float32Array(numBins);
         //this.fbBuffer = new Int32Array(numBins);
 
-        this.maxDb = -180;
+        this.maxVisualDb = 0;
+        this.minVisualDb = -180;
     }
 
     initAnal(octaveDivisions = 5, minFreq, maxFreq) {
@@ -88,6 +89,8 @@ class SquidbackCommonProcess {
         this.fftNode = this.audioContext.createAnalyser();
         this.fftNode.fftSize = fftSize;
         this.fftNode.smoothingTimeConstant = 0.9;
+        this.fftNode.minDb = -180
+        this.fftNode.maxDb = 0
 
         /*this.outFftNode = this.audioContext.createAnalyser();
         this.outFftNode.fftSize = this.fftNode.fftSize;
@@ -95,6 +98,7 @@ class SquidbackCommonProcess {
 
         this.fftSize = fftSize;
         this.numBins = this.fftNode.frequencyBinCount;
+        this.numBinsDb = Math.log10(this.fftNode.frequencyBinCount) * 20;
         this.binToFreq = this.audioContext.sampleRate / 2 / this.numBins;
     }
 
@@ -116,11 +120,11 @@ class SquidbackCommonProcess {
     // draw modularly, call every function in this.drawFunction
     // intended to implement gui options to enable/disable graphs
     draw() {
-        const smooth = 0.1;
-        this.minDb = smooth * this.minDb + (1-smooth)*(this.anal.minDb - 50);
-        this.maxDb = smooth * this.maxDb + (1-smooth)*(this.anal.maxDb + 100);
+        const smooth = 0.5;
+        this.minVisualDb = smooth * this.minVisualDb + (1-smooth)*(this.anal.minDb - 20);
+        this.maxVisualDb = smooth * this.maxVisualDb + (1-smooth)*(this.anal.maxDb + 20);
         const drawOptions = {
-            minDb: this.minDb, maxDb: this.maxDb
+            minDb: this.minVisualDb, maxDb: this.maxVisualDb
         };
         this.drawFunctions.forEach(fn=>this[fn](drawOptions))
     }
@@ -146,7 +150,7 @@ class SquidbackCommonProcess {
     }
 
     drawGain() {
-        this.graph.drawGain("red", this.autoGain.getCurrentValue(), 0, 100);
+        this.graph.drawGain("red", this.autoGain.getCurrentValueDb(), this.autoGain.minGain, this.autoGain.maxGain);
     }
 
     drawInputSpectrum(opts) {
