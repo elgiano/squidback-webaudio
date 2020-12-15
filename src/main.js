@@ -11,6 +11,7 @@ if ("serviceWorker" in navigator) {
 
 const SquidbackFilterBankProcess = require('./process/filterBankProcess.js')
 const RemoteStream = require('./remoteStream.js')
+const { AudioContext } = require('standardized-audio-context')
 
 async function init(online=false) {
     const audioContext = new AudioContext()
