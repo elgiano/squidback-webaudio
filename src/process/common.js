@@ -100,12 +100,25 @@ class SquidbackCommonProcess {
         this.binToFreq = this.audioContext.sampleRate / 2 / this.numBins;
     }
 
+    async getUserMedia(constraints) {
+        let getUserMedia;
+        if(navigator.mediaDevices) {
+            getUserMedia = navigator.mediaDevices.getUserMedia 
+        } else {
+            getUserMedia =  navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia;
+        }
+        const stream = await getUserMedia(constraints)
+    }
+
     async initIO() {
         this.input = this.audioContext.createGain();
         this.output = this.audioContext.createGain();
+
         try {
            const constraints = {audio: { noiseSuppression: false, echoCancellation: false, autoGainControl: false }};
-           const stream = await navigator.mediaDevices.getUserMedia(constraints);
+           const stream = await this.getUserMedia(constraints);
            this.inputDevice = this.audioContext.createMediaStreamSource(stream);
            console.log("[Input] Got access to input device")
          } catch(err) {
