@@ -62,8 +62,8 @@ function updateRemoteGui(remote) {
 
 window.addEventListener('load', ()=>{
     const button = document.querySelector("button#start")
-    button.addEventListener("click", ()=>{
-        init(true);
+    button.addEventListener("click", async ()=>{
+        await init(true);
         button.classList.add("started")
         document.body.requestFullscreen()
     });
