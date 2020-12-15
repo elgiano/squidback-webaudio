@@ -124,7 +124,7 @@ class SquidbackCommonProcess {
            this.inputDevice = this.audioContext.createMediaStreamSource(stream);
            console.log("[Input] Got access to input device")
          } catch(err) {
-            console.error("[Input] Can't access user input device")
+            console.error("[Input] Can't access user input device", err)
          }
     }
 
