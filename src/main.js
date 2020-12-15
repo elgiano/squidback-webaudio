@@ -1,5 +1,14 @@
 "use strict";
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker
+      .register("./serviceWorker.js")
+      .then(res => console.log("[PWA] service worker registered"))
+      .catch(err => console.log("[PWA] service worker not registered", err))
+  })
+}
+
 const SquidbackFilterBankProcess = require('./process/filterBankProcess.js')
 const RemoteStream = require('./remoteStream.js')
 
@@ -47,6 +56,4 @@ window.addEventListener('load', ()=>{
         document.body.requestFullscreen()
     });
     resizeAllCanvas();
-});
-
-
+})

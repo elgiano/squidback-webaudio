@@ -7,6 +7,19 @@ html, body {
     margin:0; padding: 0;
 }
 
+noscript {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    padding: 2em;
+    background: #111;
+    color: white;
+}
+
 body {
     padding: 0;
     
@@ -42,8 +55,9 @@ button#start {
     position: absolute;
     width: 100%;
     height: 100vh;
-    background: black; color: white;
+    background: #111; color: white;
     font-size: 2em;
+    border: 0;
 }
 
 button#start.started {
