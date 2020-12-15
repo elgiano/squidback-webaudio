@@ -1,4 +1,5 @@
 const SquidbackGraph = require('./graph.js')
+const adapter = require('webrtc-adapter')
 const { AutoGain, MagnitudesHistory } = require("../audio-processors/index.js")
 
 // this class is here because I've been experimenting with different processes
@@ -105,9 +106,6 @@ class SquidbackCommonProcess {
         if(navigator.mediaDevices) {
             stream = await navigator.mediaDevices.getUserMedia(constraints)
         } else {
-            navigator.getUserMedia =  navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia;
             stream = await navigator.getUserMedia(constraints)
         }
         return stream
