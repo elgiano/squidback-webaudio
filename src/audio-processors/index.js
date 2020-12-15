@@ -3,4 +3,5 @@ module.exports = {
     ...require("./autoGain.js"),
     ...require("./fftConvFilter.js"),
     ...require("./notchFilterBank.js"),
+    ...require("./mel-rebin.js"),
 }

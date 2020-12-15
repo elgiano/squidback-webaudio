@@ -10,9 +10,6 @@ class NotchFilterBank {
         }
         this.scale = scale;
         this.filters = [];
-        this.inMeters = [];
-        this.gains = [];
-        this.outMeters = [];
 
         this.q = q || calculateQs(this.scale); //console.log(q);
 
@@ -22,9 +19,8 @@ class NotchFilterBank {
     makeFiltersFromScale(scale, q) {
         this.scale.forEach((freq,i)=>{
           const filter = this.audioContext.createBiquadFilter();
-          filter.type = "notch"; filter.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+          filter.type = "peaking"; filter.frequency.setValueAtTime(freq, this.audioContext.currentTime);
           filter.gain.value = 1;
-          // TODO: need to calculate Q more accurately
           filter.Q.value = typeof q == 'object' ? q[i] : q ;
           this.filters.push(filter);
         })
@@ -33,6 +29,7 @@ class NotchFilterBank {
     }
 
     getFrequencyResponse(freqs, response) {
+        response.fill(1);
         const tmp = new Float32Array(freqs.length);
         const _ = new Float32Array(freqs.length);
         this.filters.forEach(f=>{
@@ -41,12 +38,28 @@ class NotchFilterBank {
         })
     }
 
+    forEachFreqResponse(freqs, action) {
+        const tmp = new Float32Array(freqs.length);
+        const _ = new Float32Array(freqs.length);
+        this.filters.forEach(f=>{
+            f.getFrequencyResponse(freqs,tmp,_)
+            action(tmp)
+        })
+    }
+
     connectInput(input) {
         input.connect(this.filters[0])
+        return this.filters[this.filters.length-1]
     }
     connect(output) {
         this.filters[this.filters.length-1].connect(output)
         return output
+    }
+
+    setGains(gains) {
+        gains.forEach((g,n)=>{
+            this.filters[n].gain.value = g
+        })
     }
 
 }

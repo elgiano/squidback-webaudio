@@ -1,7 +1,9 @@
 "use strict";
 
-const SquidbackWorkletProcess = require('./workletProcess.js')
-const SquidbackFFTProcess = require('./fftProcess.js')
+//const SquidbackWorkletProcess = require('./worklet/workletProcess.js')
+// const SquidbackFFTProcess = require('./process/fftProcess.js')
+const SquidbackFilterBankProcess = require('./process/filterBankProcess.js')
+const RemoteStream = require('./remoteStream.js')
 
 async function init() {
     const audioContext = new AudioContext()
@@ -9,8 +11,19 @@ async function init() {
         handleNoWorklet();
         return;
     }
-    let process = new SquidbackFFTProcess(audioContext, 512);
-    await process.start()
+    let process = new SquidbackFilterBankProcess(audioContext, document.querySelector("canvas#spectrum"));
+    await process.start(2048)
+
+    let remote = new RemoteStream(audioContext);
+    remote.connect(process.output, process.input)
+
+    window.addEventListener('resize', ()=>{
+        resizeAllCanvas();
+        process.clearGraphCache()
+    });
+
+    // let process = new SquidbackFFTProcess(audioContext);
+    // await process.start(512)
 }
 
 function handleNoWorklet() {
@@ -47,10 +60,9 @@ window.addEventListener('load', ()=>{
     button.addEventListener("click", ()=>{
         init();
         button.classList.add("started")
+        document.body.requestFullscreen()
     });
     resizeAllCanvas();
 });
 
-window.addEventListener('resize', ()=>{
-    resizeAllCanvas()
-});
+

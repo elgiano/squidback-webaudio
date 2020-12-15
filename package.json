@@ -1,7 +1,7 @@
 {
-  "name": "phaze",
+  "name": "squidback",
   "version": "1.0.0",
-  "description": "A phase vocoder for the browser",
+  "description": "unleash your feedbacks",
   "main": "index.js",
   "scripts": {
     "build-main": "browserify src/main.js -o www/main.js",
@@ -14,19 +14,23 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "phase",
-    "vocoder",
-    "pitch",
-    "time",
-    "stretch"
+    "feedback",
+    "larsen",
+    "performance",
+    "instrument",
+    "adaptive filter"
   ],
-  "author": "Mano, Gon & Olivier",
-  "license": "The Unlicense",
+  "author": "Gianluca Elia",
+  "license": "",
   "dependencies": {
+    "array-smooth": "^1.0.0",
     "cubic-spline": "^3.0.3",
     "d3-peaks": "0.0.1",
     "fft.js": "^4.0.3",
-    "http-server": "^0.12.1"
+    "http-server": "^0.12.1",
+    "kissfft-js": "^0.1.8",
+    "rtcmulticonnection": "^3.7.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "browserify": "^16.5.0",

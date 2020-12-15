@@ -2,10 +2,10 @@ class AutoGain {
     constructor(audioContext) {
         this.gainIncrement = 0.001;
         this.gainDecrement = 0.001;
-        this.minVolume = -10;
+        this.minVolume = -40;
         this.maxVolume = -10;
-        this.maxGain = 1e5;
-        this.minGain = -1e5;
+        this.maxGain = 100;
+        this.minGain = -100;
 
         this.gain = audioContext.createGain();
         this.limiter = audioContext.createDynamicsCompressor()
@@ -20,7 +20,7 @@ class AutoGain {
     updateGain(maxDb) {
         if(maxDb <= -180) return
         const currentGain = 20 * Math.log10(this.gain.gain.value);
-        this.gain.gain.cancelAndHoldAtTime(this.now())
+        this.gain.gain.cancelScheduledValues(this.now())
 
         let nextGain = currentGain;
         if(maxDb > this.maxVolume) {
