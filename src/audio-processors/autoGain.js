@@ -28,7 +28,7 @@ class AutoGain {
         if(Math.abs(diff) > this.tolerance)
             nextGain += diff * (diff > 0 ? this.gainIncrement : this.gainDecrement)
 
-        console.log(maxDb, this.desiredLevel, diff, nextGain)
+        // console.log(maxDb, this.desiredLevel, diff, nextGain)
         nextGain = this.smoothing * currentGain + (1-this.smoothing) * nextGain
 
         if(nextGain != currentGain) {
