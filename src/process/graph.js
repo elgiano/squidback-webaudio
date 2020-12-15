@@ -122,12 +122,10 @@ class SquidbackGraph {
     drawGain(color, db=0, min=0, max=1) {
         const canvas = this.canvas; const canvasCtx = this.canvasCtx
         const gainHeight = db / (db < 0 ? (-min) : max) * canvas.height / 2;
-        canvasCtx.beginPath();
         canvasCtx.fillStyle = "rgba(30%,30%,30%,1)";
         canvasCtx.fillRect(canvas.width-2, 0, 2, canvas.height);
         canvasCtx.fillStyle = color;
         canvasCtx.fillRect(canvas.width-2, canvas.height / 2, 2,  - gainHeight);
-        canvasCtx.closePath();
     }
 
     pitchAmpToHSLA(pitch,amp=255,alpha=0.1){

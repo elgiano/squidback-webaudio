@@ -1,3 +1,4 @@
+const {CQRebin} = require('./cq-rebin.js')
 const {MelRebin} = require('./mel-rebin.js')
 
 function ampdb(amp) { return 20 * Math.log10(amp) }
@@ -74,12 +75,14 @@ class MSD {
         //this.magDiffDiffHistory.copyWithin(this.numBins,0);
     }
 
-    analyzeSpectrum(spectrum, smoothing=0.99) {
+    analyzeSpectrum(spectrum, smoothing=0.1) {
+        // console.log(spectrum)
         for(let bin = 0; bin < spectrum.length; ++bin)
             this.addForBin(bin, spectrum[bin], smoothing)
     }
 
     addForBin(binIndex, magDb, smoothing) {
+        if(!isFinite(magDb)) {console.log(magDb); magDb = -180}
         this.magHistory[binIndex] = (1-smoothing) * magDb + smoothing * this.magHistory[binIndex];
         //const magDiff =  magDb - this.magHistory[binIndex + this.numBins];
         //const magDiffDiff = Math.pow(magDiff - this.lastMagDiff[binIndex], 2);
@@ -100,8 +103,10 @@ class MSD {
 class MagnitudesHistory {
 
     constructor(sampleRate, fftSize, /*historySize,*/ octaveDivisions = 5, minFreq, maxFreq, minPeakThr=-40) {
-        this.mel = new MelRebin(sampleRate, fftSize, octaveDivisions, minFreq, maxFreq);
-        this.numFilters = this.mel.filter.freqs.length;
+        this.numFilters = 30;
+        this.mel = new MelRebin(sampleRate, fftSize, this.numFilters, minFreq, maxFreq);
+        //this.mel = new MelRebin(sampleRate, fftSize, octaveDivisions, minFreq, maxFreq);
+        //this.numFilters = this.mel.freqs.length;
         this.melMagDb = new Float32Array(this.numFilters)
         this.avgThr = 0.5;
 

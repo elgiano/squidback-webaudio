@@ -1,51 +1,76 @@
+/*===========================================================================*\
+ * Experimental implementation of MFCC.
+ * (c) Vail Systems. Joshua Jung and Ben Bryan. 2015
+ *
+ * This code is not designed to be highly optimized but as an educational
+ * tool to understand the Mel-scale and its related coefficients used in
+ * human speech analysis.
+\*===========================================================================*/
+
 class MelRebin {
-    constructor(sampleRate, fftSize, div, minFreq, maxFreq) {
-        this.freqToBin = fftSize / sampleRate;
-        this.filter = this.calcSpectralFilter(div, minFreq, maxFreq);
+
+    constructor(sampleRate, fftSize, bankCount, lowFrequency, highFrequency) {
+      this.constructMelFilterBank(fftSize, bankCount, lowFrequency, highFrequency, sampleRate);
     }
 
-    calcSpectralFilter(div, minFreq, maxFreq) {
-        console.log(`[mel] calculating mel ${div}-tet from ${minFreq} to ${maxFreq} Hz`)
-        let bins = [], filters = [];
-        const numFilters = Math.floor(Math.log2(maxFreq / minFreq) * div);
-        const freqs = new Float32Array(numFilters);
-        const interval = Math.pow(2, 1/div);
-        let freq = minFreq;
-        for(let i = 0; i < numFilters; ++i) {
-            freqs[i] = freq;
-            bins[i] = Math.floor(freq * this.freqToBin)
-            freq *= interval;
+    constructMelFilterBank(fftSize, nFilters, lowF, highF, sampleRate) {
+
+          const filters = [];
+          const startBins = new Uint16Array(nFilters);
+          const freqs = new Float32Array(nFilters);
+
+        var lowM = hzToMels(lowF),
+          highM = hzToMels(highF),
+          deltaM = (highM - lowM) / (nFilters+1);
+
+        // Construct equidistant Mel values between lowM and highM.
+        for (var i = 0; i < nFilters; i++) {
+            freqs[i] = melsToHz(lowM + (i * deltaM));
+            //startBins[i] = Math.floor((fftSize+1) * freqs[i] / (sampleRate/2));
+            startBins[i] = Math.floor((fftSize/sampleRate) * freqs[i]);
         }
 
-        const finalBin = Math.floor(freq * this.freqToBin);
-        let leftBin = Math.floor(minFreq/interval * this.freqToBin)
-        for (let i = 0; i < numFilters; i++) {
-            let centerBin = bins[i];
-            let rightBin = (i < numFilters - 1) ? bins[i+1] : finalBin;
-            filters[i] = [];
-            for (let bin = leftBin, j=0; bin <= rightBin; bin++, j++) {
-                if(bin < centerBin)
-                    filters[i][j] = 1.0 - (centerBin - bin) / (centerBin - leftBin);
-                else if(bin == centerBin)
-                    filters[i][j] = 1.0
-                else
-                    filters[i][j] = 1.0 - (bin - centerBin) / (rightBin - centerBin);
+        // Construct one cone filter per bin.
+        // Filters end up looking similar to [... 0, 0, 0.33, 0.66, 1.0, 0.66, 0.33, 0, 0...]
+        for (var i = 0; i < startBins.length; i++) {
+            const newFilter = [];
+            var filterRange = (i != startBins.length-1) ? startBins[i+1] - startBins[i] : startBins[i] - startBins[i-1];
+            const centerBin = startBins[i];
+            const leftBin = startBins[i] - filterRange;
+            const rightBin = startBins[i] + filterRange
+            for (let bin = leftBin; bin < rightBin; bin++) {
+              let coeff;
+              // Left edge of cone
+              if (bin < centerBin) coeff = 1.0 - ((centerBin - bin) / filterRange);
+              // Peak of cone
+              else if (bin == centerBin) coeff = 1.0;
+              // Right edge of cone
+              else if (bin < rightBin) coeff = 1.0 - (bin-centerBin) / filterRange;
+              newFilter.push(coeff)
             }
-            bins[i] = leftBin;
-            leftBin = centerBin;
+            filters[i] = newFilter;
         }
 
-        return {freqs, bins, filters}
+        console.log("mel bins after adjusting", startBins, filters, freqs)
+
+        // Store for debugging.
+        this.startBins = startBins;
+
+        this.filters = filters
+        this.freqs = freqs
     }
 
-    filterSpectrum(magnitudes) {
-        // console.log(this.filter)
-        return this.filter.filters.map((filter,filter_i)=>{
-            const startBin = this.filter.bins[filter_i];
-            return filter.reduce((t,coeff,i)=>
-                t + (magnitudes[startBin+i] * coeff)
-            ,0);
-        })
+    filter(freqPowers) {
+      var ret = [];
+
+      filters.forEach( (filter, fIx) => {
+        var tot = 0;
+        freqPowers.forEach( (fp, pIx) => {
+          tot += fp * filter[pIx];
+        });
+        ret[fIx] = tot;
+      }); 
+      return ret;
     }
 
     filterUint8SpectrumInPlace(magnitudes, results, minDb=0, maxDb=1) {
@@ -55,24 +80,38 @@ class MelRebin {
         let avg = 0;
         const byteToFloat = (maxDb-minDb) / 255;
 
-        this.filter.filters.forEach((filter,filter_i)=>{
-            const startBin = this.filter.bins[filter_i];
-            const sum = minDb + filter.reduce((t,coeff,i)=>
+        //console.log(maxDb, minDb, byteToFloat)
+
+        for(let i=0; i< magnitudes.length; i++)
+            magnitudes[i] = Math.pow(10, magnitudes[i] * 0.05)
+
+        this.filters.forEach((filter,filter_i)=>{
+            const startBin = this.startBins[filter_i];
+            let sum = filter.reduce((t,coeff,i)=>
                 t + (magnitudes[startBin+i] * coeff)
-            ,0) * byteToFloat;
-                
+            ,0);
+
+            sum = 20 * Math.log10(sum)
             results[filter_i] = sum;
             if(sum > max) {
                 max = sum; nMax = filter_i
             } else if(sum < min) min = sum
             avg += sum
         })
+
+        // console.log(results)
+
         return [min, max, nMax, avg / results.length];
     }
-
-    melsToHz(mels) {  return 700 * (Math.exp(mels / 1127) - 1) }
-    hzToMels(hertz) { return 1127 * Math.log(1 + hertz/700) }
-
 }
 
-module.exports = {MelRebin}
+function melsToHz(mels) {
+  return 700 * (Math.exp(mels / 1127) - 1);
+}
+
+function hzToMels(hertz) {
+  return 1127 * Math.log(1 + hertz/700);
+}
+
+module.exports = { MelRebin }
+

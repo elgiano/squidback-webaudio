@@ -29,7 +29,7 @@ class AutoGain {
             nextGain += (this.desiredLevel - maxDb) * this.gainIncrement
         }
 
-        console.log(maxDb, this.desiredLevel, currentGain, nextGain)
+        // console.log(maxDb, this.desiredLevel, currentGain, nextGain)
         nextGain = this.smoothing * currentGain + (1-this.smoothing) * nextGain
 
         if(nextGain != currentGain) {

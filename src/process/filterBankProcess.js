@@ -1,8 +1,5 @@
 const SquidbackCommonProcess = require ('./common.js');
-const { 
-    MelRebin,
-    NotchFilterBank
-} = require("../audio-processors/index.js")
+const { NotchFilterBank } = require("../audio-processors/notchFilterBank.js")
 
 class SquidbackFilterBankProcess extends SquidbackCommonProcess {
 
@@ -11,7 +8,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         this.drawFunctions = [
             'drawColorBg',
             'drawGain',
-            'drawSlopes',
+            //'drawSlopes',
 
             'drawMelInput',
             //'drawOutputSpectrumForFilterFreqs',
@@ -19,12 +16,17 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         ]
     }
 
-    initFilterBank(div=5, minFreq, maxFreq) {
-        const interval = Math.pow(2, 1/this.octaveDivisions);
-        const q = Math.sqrt(interval) / (interval - 1);
-        this.filterBank = new NotchFilterBank(this.audioContext, this.anal.mel.filter.freqs, q)
+    initFilterBank() {
+        //const interval = Math.pow(2, 1/this.octaveDivisions);
+        //const q = Math.sqrt(interval) / (interval - 1);
+
+        const intervals = this.anal.mel.freqs.map((v,i,a)=>
+            i==0 ? (a[i+1] / v) : (v / a[i-1])
+        );
+        const  q = intervals.map(v=>Math.sqrt(v) / (v - 1))
+        this.filterBank = new NotchFilterBank(this.audioContext, this.anal.mel.freqs, q)
         this.freqResponse = new Float32Array(this.anal.numFilters);
-        this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
+        this.filterBank.getFrequencyResponse(this.anal.mel.freqs, this.freqResponse);
     }
 
     connectAll() {
@@ -55,8 +57,8 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
     }
 
     updateSpectrum() {
-        //this.fftNode.getFloatFrequencyData(this.fftBuffer);
-        this.fftNode.getByteFrequencyData(this.fftBuffer);
+        this.fftNode.getFloatFrequencyData(this.fftBuffer);
+        //this.fftNode.getByteFrequencyData(this.fftBuffer);
         //this.outFftNode.getFloatFrequencyData(this.outFftBuffer);
         this.anal.analyseSpectrum(this.fftBuffer, this.fftNode.minDecibels, this.fftNode.maxDecibels);
         this.currentVolume = this.anal.maxDb;// - this.numBinsDb;
@@ -64,19 +66,18 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         this.anal.normalizeReductions(correctionBaselineAmp);
         this.filterGains = this.anal.magReductions;
         this.filterBank.setGains(this.filterGains);
-        this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
+        this.filterBank.getFrequencyResponse(this.anal.mel.freqs, this.freqResponse);
     }
 
     findCorrectionBaseline() {
         this.filterBank.setGains(this.anal.magReductions);
-        this.filterBank.getFrequencyResponse(this.anal.mel.filter.freqs, this.freqResponse);
+        this.filterBank.getFrequencyResponse(this.anal.mel.freqs, this.freqResponse);
         return Math.max(...this.freqResponse);
     }
 
     // graphs
 
     drawMelInput(opts) {
-        //this.graph.drawLogLine("canvas#spectrum", this.fftBuffer.slice(this.minFilterBin, this.maxFilterBin), opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)", 1);
         this.graph.fillLine(this.anal.melMagDb, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)");
     }
     /*drawOutputSpectrumForFilterFreqs(opts) {
@@ -92,9 +93,9 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
 
     drawFR(opts) {
         // freqResponse is updated in updateSpectrum
-        this.graph.drawSmoothCQDB(this.freqResponse , -80, 0, "rgba(30,30,30,0.4)", this.anal.mel.filter.freqs);
-        this.filterBank.forEachFreqResponse(this.anal.mel.filter.freqs, spectrum=>{
-            this.graph.drawSmoothCQDB(spectrum, -80, 0, "rgba(0,0,0,0.3)", this.anal.mel.filter.freqs);
+        this.graph.drawSmoothCQDB(this.freqResponse , -40, 0, "rgba(30,30,30,0.4)", this.anal.mel.freqs);
+        this.filterBank.forEachFreqResponse(this.anal.mel.freqs, spectrum=>{
+            this.graph.drawSmoothCQDB(spectrum, -40, 0, "rgba(0,0,0,0.3)", this.anal.mel.freqs);
         })
     }
 }

@@ -52,7 +52,8 @@ class SquidbackCommonProcess {
 
     initBuffers(minFreq, maxFreq) {
         const numBins = this.numBins;
-        this.fftBuffer = new Uint8Array(numBins);
+        //this.fftBuffer = new Uint8Array(numBins);
+        this.fftBuffer = new Float32Array(numBins);
         //this.outFftBuffer = new Float32Array(numBins);
         //this.fbBuffer = new Int32Array(numBins);
 
@@ -61,20 +62,17 @@ class SquidbackCommonProcess {
     }
 
     initAnal(octaveDivisions = 5, minFreq, maxFreq) {
-        minFreq = minFreq || this.hipassFreq / 1.2
+        minFreq = minFreq || this.hipassFreq
         maxFreq = maxFreq || this.lopassFreq * 1.2
         this.octaveDivisions = octaveDivisions;
-        this.anal = new MagnitudesHistory(this.audioContext.sampleRate, this.fftSize, 5, minFreq, maxFreq, -60);
+        this.anal = new MagnitudesHistory(this.audioContext.sampleRate, this.fftSize, octaveDivisions, minFreq, maxFreq, -60);
 
-        const minBin = minFreq / this.binToFreq;
-        const maxBin = maxFreq / this.binToFreq;
-        this.minFilterBin = Math.round(minBin); this.maxFilterBin = Math.round(maxBin);
         this.graph.setupFreqAxis(minFreq, maxFreq, this.binToFreq)
     }
 
     initExtremesFilters() {
         const hipass = this.audioContext.createBiquadFilter(); hipass.type = "highpass"; 
-        this.hipassFreq = Math.min(this.binToFreq * 2, 80)
+        this.hipassFreq = this.binToFreq * 2
         hipass.frequency.setValueAtTime(this.hipassFreq,  this.audioContext.currentTime);
         hipass.Q.setValueAtTime(0.707, this.audioContext.currentTime);
 
@@ -89,8 +87,8 @@ class SquidbackCommonProcess {
         this.fftNode = this.audioContext.createAnalyser();
         this.fftNode.fftSize = fftSize;
         this.fftNode.smoothingTimeConstant = 0.9;
-        this.fftNode.minDb = -180
-        this.fftNode.maxDb = 0
+        this.fftNode.minDecibels = -180
+        this.fftNode.maxDecibels = 0
 
         /*this.outFftNode = this.audioContext.createAnalyser();
         this.outFftNode.fftSize = this.fftNode.fftSize;
@@ -121,8 +119,8 @@ class SquidbackCommonProcess {
     // intended to implement gui options to enable/disable graphs
     draw() {
         const smooth = 0.5;
-        this.minVisualDb = smooth * this.minVisualDb + (1-smooth)*(this.anal.minDb - 20);
-        this.maxVisualDb = smooth * this.maxVisualDb + (1-smooth)*(this.anal.maxDb + 20);
+        this.minVisualDb = -120;//smooth * this.minVisualDb + (1-smooth)*(this.anal.minDb * 1.01);
+        this.maxVisualDb = -10;//smooth * this.maxVisualDb + (1-smooth)*(this.anal.maxDb + 10);
         const drawOptions = {
             minDb: this.minVisualDb, maxDb: this.maxVisualDb
         };
