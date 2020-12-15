@@ -101,15 +101,17 @@ class SquidbackCommonProcess {
     }
 
     async getUserMedia(constraints) {
-        let getUserMedia;
+        let stream;
         if(navigator.mediaDevices) {
-            getUserMedia = navigator.mediaDevices.getUserMedia 
+            stream = await navigator.mediaDevices.getUserMedia(constraints)
         } else {
-            getUserMedia =  navigator.getUserMedia ||
+            navigator.getUserMedia =  navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetUserMedia;
+            stream = await navigator.getUserMedia(constraints)
         }
-        const stream = await getUserMedia(constraints)
+        return stream
+
     }
 
     async initIO() {
