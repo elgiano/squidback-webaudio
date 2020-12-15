@@ -51,7 +51,7 @@ class MelRebin {
             filters[i] = newFilter;
         }
 
-        console.log("mel bins after adjusting", startBins, filters, freqs)
+        // console.log("mel bins", startBins, freqs, filters)
 
         // Store for debugging.
         this.startBins = startBins;

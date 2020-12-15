@@ -102,8 +102,8 @@ class MSD {
 
 class MagnitudesHistory {
 
-    constructor(sampleRate, fftSize, /*historySize,*/ octaveDivisions = 5, minFreq, maxFreq, minPeakThr=-40) {
-        this.numFilters = 30;
+    constructor(sampleRate, fftSize, numFilters = 45, minFreq, maxFreq, minPeakThr=-40) {
+        this.numFilters = numFilters;
         this.mel = new MelRebin(sampleRate, fftSize, this.numFilters, minFreq, maxFreq);
         //this.mel = new MelRebin(sampleRate, fftSize, octaveDivisions, minFreq, maxFreq);
         //this.numFilters = this.mel.freqs.length;
