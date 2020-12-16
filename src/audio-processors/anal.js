@@ -64,14 +64,16 @@ class MSD {
         this.lastMagDiff = new Float32Array(numBins);
         //this.magDiffDiffNormalize = 1 / historySize;
         this.slopes = new Float32Array(numBins);
+        this.slopeScores = new Float32Array(numBins);
     }
 
     prepareNewBlock() {
-        /*const lastMemBlock =  this.numBins * (this.historySize - 1);
-        for(let bin = 0; bin < this.numBins; ++bin) {
-            this.msd[bin] -= this.magDiffDiffHistory[lastMemBlock + bin];
+        //const lastMemBlock =  this.numBins * (this.historySize - 1);
+        /*for(let bin = 0; bin < this.numBins; ++bin) {
+            //this.msd[bin] -= this.magDiffDiffHistory[lastMemBlock + bin];
         }*/
         this.magHistory.copyWithin(this.numBins,0);
+        
         //this.magDiffDiffHistory.copyWithin(this.numBins,0);
     }
 
@@ -96,7 +98,19 @@ class MSD {
     }
 
     getSlope(binIndex, framesAgo=(this.historySize-1)) { 
-        return this.magHistory[binIndex] - this.magHistory[framesAgo*this.numBins + binIndex]
+        const slope = this.magHistory[binIndex] - this.magHistory[framesAgo*this.numBins + binIndex]
+        if(slope < 5 && slope > -5)
+            this.slopeScores[binIndex] -= Math.sign(this.slopeScores[binIndex])
+        else
+            this.slopeScores[binIndex] += Math.sign(slope)
+
+        return slope
+    }
+
+    getSlopes(binIndex) {
+        const breakpoints = [0, 0.5, 1].map(b=> b *  (this.historySize - 1) * this.numBins)
+        const slopes = breakpoints.slice(0,-1).map((start, i)=> this.magHistory[start] - this.magHistory[breakpoints[i+1]])
+        return slopes
     }
 }
 
@@ -121,7 +135,7 @@ class MagnitudesHistory {
         this.correctionSmoothing = 1-1e-3;//-3;
         this.maxCorrection = -80;
         this.correctionMemory = new Float32Array(this.numFilters);
-        this.correctionMemoryFactor = 1e-5;
+        this.correctionMemoryFactor = 1e-3;
     }
 
     analyseSpectrum(buffer, minDb, maxDb) {
@@ -142,7 +156,7 @@ class MagnitudesHistory {
 
         this.msd.analyzeSpectrum(this.melMagDb);
 
-        for(const bin in this.melMagDb) {
+        for(let bin = 0; bin < this.melMagDb.length; bin++) {
             this.correctMagnitude(bin)
         }
     }
@@ -152,12 +166,21 @@ class MagnitudesHistory {
         let correction = (this.peakThr - this.melMagDb[bin]);// * this.peakFinder.peakPersistence[bin];// * 2;
         // console.log(correction, this.peakThr, this.melMagDb[bin])
 
+        //const slopes = this.msd.getSlopes(bin);
+        //console.log(slopes)
+        const slopeScore = this.msd.slopeScores[bin];
         const slope = this.msd.slopes[bin]
         if(correction < 0){
-            if(slope < -5)
+            /*if(slope < -1)
                 correction *= -2
-            else if(slope > 5)
-                correction *= 0.01
+            else if(slope > 1)
+                correction *= 0.01*/
+            if(slopeScore > 5) correction *= 0.1
+            else if(slopeScore < -5)  correction *= -1.5
+            /*if(slopes[0] < -1 && slopes[1] < -1)
+                correction *= -2
+            else if(!(slopes[1] < 1 && slopes[1] > -1 && slopes[0] < 1))
+                correction *= 0.01*/
         }
 
         correction = this.correctionSmoothing * this.magReductions[bin] + (1-this.correctionSmoothing) * correction

@@ -4,16 +4,21 @@ class NotchFilterBank {
         this.scale = scale;
         this.q = q; 
         this.filters = [];
-
         //|| calculateQs(this.scale); //console.log(q);
 
         this.makeFiltersFromScale(this.scale, this.q);
+
+        this.totalFreqResponse = new Float32Array(this.filters.length);
+        this.singleFreqResponse = new Array(this.filters.length)
+        for(let i = 0; i < this.filters.length; i++)
+            this.singleFreqResponse[i] = new Float32Array(this.filters.length);
     }
 
     makeFiltersFromScale() {
         this.scale.forEach((freq,i)=>{
           const filter = this.audioContext.createBiquadFilter();
-          filter.type = "peaking"; filter.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+          const type = i == 0 ? "lowshelf" : i == freq.length - 1 ? "highshelf" : "peaking";
+          filter.type = type; filter.frequency.setValueAtTime(freq, this.audioContext.currentTime);
           filter.gain.value = 1;
           filter.Q.value = typeof this.q == 'object' ? this.q[i] : this.q ;
           this.filters.push(filter);
@@ -38,6 +43,15 @@ class NotchFilterBank {
         this.filters.forEach(f=>{
             f.getFrequencyResponse(freqs,tmp,_)
             action(tmp)
+        })
+    }
+
+    updateFreqResponses(freqs) {
+        this.totalFreqResponse.fill(1);
+        const _ = new Float32Array(freqs.length);
+        this.filters.forEach((f,i)=>{
+            f.getFrequencyResponse(freqs,this.singleFreqResponse[i],_)
+            this.singleFreqResponse[i].forEach((t,n)=>this.totalFreqResponse[n]*=t)
         })
     }
 

@@ -1,8 +1,8 @@
 class AutoGain {
     constructor(audioContext) {
-        this.gainIncrement = 0.05 / 100;
-        this.gainDecrement = 0.05 / 200;
-        this.desiredLevel = -40;
+        this.gainIncrement = 0.05 / 50;
+        this.gainDecrement = 0.05 / 100;
+        this.desiredLevel = -10;
         this.tolerance = 5;
         this.maxGain = 20;
         this.minGain = -20;
