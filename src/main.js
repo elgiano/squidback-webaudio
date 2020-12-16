@@ -25,6 +25,8 @@ async function init(online=false) {
         process.clearGraphCache()
     });
 
+    window.process = process;
+
     // let process = new SquidbackFFTProcess(audioContext);
     // await process.start(512)
 }
@@ -35,6 +37,7 @@ function startRemote(process) {
         updateRemoteGui(remote)
     });
     updateRemoteGui(remote)
+    window.remote = remote
 }
 
 

@@ -95,9 +95,9 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
     }
     drawFRBox(opts) {
         // freqResponse is updated in updateSpectrum
-        //this.graph.drawSmoothCQDB(this.filterBank.totalFreqResponse, -40, 0, "rgba(30,30,30,0.4)");
+        this.graph.boxFilters(this.filterBank.totalFreqResponse, -40, 0, "rgba(30,30,30,0.03)");
         this.filterBank.singleFreqResponse.forEach(spectrum=>{
-            this.graph.boxFilters(spectrum, -40, 0, "rgba(0,0,0,0.05)");
+            this.graph.boxFilters(spectrum, -40, 0, "rgba(0,0,0,0.03)");
         })
     }
 }

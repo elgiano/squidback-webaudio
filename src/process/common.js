@@ -160,7 +160,7 @@ class SquidbackCommonProcess {
     }
 
     drawGain() {
-        this.graph.drawGain("red", this.autoGain.getCurrentValueDb(), this.autoGain.minGain, this.autoGain.maxGain);
+        this.graph.drawGain("rgb(200,0,0)", this.autoGain.getCurrentValueDb(), this.autoGain.minGain, this.autoGain.maxGain);
     }
 
     drawInputSpectrum(opts) {

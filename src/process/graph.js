@@ -59,7 +59,7 @@ class SquidbackGraph {
         const canvas = this.canvas;
         const canvasCtx = this.canvasCtx;
         canvasCtx.fillStyle = color;
-        console.log(data)
+        // console.log(data)
 
         let barHeight;
         const barWidth = (canvas.width / (data.length - 1));
@@ -154,10 +154,10 @@ class SquidbackGraph {
     drawGain(color, db=0, min=0, max=1) {
         const canvas = this.canvas; const canvasCtx = this.canvasCtx
         const gainHeight = db / (db < 0 ? (-min) : max) * canvas.height / 2;
-        canvasCtx.fillStyle = "rgba(30%,30%,30%,1)";
-        canvasCtx.fillRect(canvas.width-2, 0, 2, canvas.height);
+        canvasCtx.fillStyle = "rgba(20%,20%,20%,1)";
+        canvasCtx.fillRect(canvas.width-1, 0, 1, canvas.height);
         canvasCtx.fillStyle = color;
-        canvasCtx.fillRect(canvas.width-2, canvas.height / 2, 2,  - gainHeight);
+        canvasCtx.fillRect(canvas.width-1, canvas.height / 2, 1,  - gainHeight);
     }
 
     pitchAmpToHSLA(pitch,amp=255,alpha=0.1){
