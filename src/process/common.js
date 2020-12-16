@@ -62,7 +62,7 @@ class SquidbackCommonProcess {
         this.minVisualDb = -180;
     }
 
-    initAnal(numFilters = /*30*/60, minFreq, maxFreq) {
+    initAnal(numFilters = /*30*/30, minFreq, maxFreq) {
         minFreq = minFreq || this.hipassFreq
         maxFreq = maxFreq || this.lopassFreq * 1.2
         this.anal = new MagnitudesHistory(this.audioContext.sampleRate, this.fftSize, numFilters, minFreq, maxFreq, -60);
