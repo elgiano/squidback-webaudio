@@ -31,7 +31,7 @@ class RemoteStream {
         };
 
         this.connection.onstreamended = (event) => {
-            this.disconnectStream(event.stream.streamid);
+            this.disconnectStream(event.stream);
             callback()
         };
 
@@ -56,8 +56,9 @@ class RemoteStream {
         this.streamSource.connect(gain).connect(this.destination);
     }
 
-    disconnectStream(streamid) {
+    disconnectStream(stream) {
         if(stream.type == 'local') return
+        const streamid = stream.id;
         console.log("[webrtc] disconnecting", streamid)
         if(this.streams[streamid]) {
             this.streams[streamid].disconnect();
