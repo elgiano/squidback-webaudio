@@ -10,9 +10,9 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
             'drawGain',
             'drawSlopes',
 
-            'drawMelInput',
+            'drawMelInputBox',
             //'drawOutputSpectrumForFilterFreqs',
-            'drawFR'
+            'drawFRBox'
         ]
     }
 
@@ -62,7 +62,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         this.anal.analyseSpectrum(this.fftBuffer, this.fftNode.minDecibels, this.fftNode.maxDecibels);
         this.currentVolume = this.anal.maxDb;// - this.numBinsDb;
         this.anal.normalizeReductions(this.correctionBaseline || 1);
-        this.filterBank.setGains(this.anal.magReductions);
+        this.filterBank.setGains(this.anal.magReductions,this.anal.correctionMemory);
         this.filterBank.updateFreqResponses(this.anal.mel.freqs);
         this.correctionBaseline = Math.max(...this.filterBank.totalFreqResponse)
     }
@@ -71,6 +71,9 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
 
     drawMelInput(opts) {
         this.graph.fillLine(this.anal.melMagDb, opts.minDb, opts.maxDb,"rgba(255,255,255,0.5)");
+    }
+    drawMelInputBox(opts) {
+        this.graph.boxSpectrum(this.anal.melMagDb, opts.minDb, opts.maxDb,"rgba(255,255,255,0.1)");
     }
     /*drawOutputSpectrumForFilterFreqs(opts) {
         //this.graph.drawLogLine("canvas#spectrum", this.outFftBuffer.slice(this.minFilterBin, this.maxFilterBin), opts.minDb, opts.maxDb, "rgba(0,0,0,0.05)", 1);
@@ -85,9 +88,16 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
 
     drawFR(opts) {
         // freqResponse is updated in updateSpectrum
-        this.graph.drawSmoothCQDB(this.filterBank.totalFreqResponse, -40, 0, "rgba(30,30,30,0.4)", this.anal.mel.freqs);
+        this.graph.drawSmoothCQDB(this.filterBank.totalFreqResponse, -40, 0, "rgba(30,30,30,0.4)");
         this.filterBank.singleFreqResponse.forEach(spectrum=>{
             this.graph.drawSmoothCQDB(spectrum, -40, 0, "rgba(0,0,0,0.3)", this.anal.mel.freqs);
+        })
+    }
+    drawFRBox(opts) {
+        // freqResponse is updated in updateSpectrum
+        //this.graph.drawSmoothCQDB(this.filterBank.totalFreqResponse, -40, 0, "rgba(30,30,30,0.4)");
+        this.filterBank.singleFreqResponse.forEach(spectrum=>{
+            this.graph.boxFilters(spectrum, -40, 0, "rgba(0,0,0,0.05)");
         })
     }
 }

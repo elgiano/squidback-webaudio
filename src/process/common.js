@@ -62,7 +62,7 @@ class SquidbackCommonProcess {
         this.minVisualDb = -180;
     }
 
-    initAnal(numFilters = 30, minFreq, maxFreq) {
+    initAnal(numFilters = /*30*/60, minFreq, maxFreq) {
         minFreq = minFreq || this.hipassFreq
         maxFreq = maxFreq || this.lopassFreq * 1.2
         this.anal = new MagnitudesHistory(this.audioContext.sampleRate, this.fftSize, numFilters, minFreq, maxFreq, -60);
@@ -131,8 +131,8 @@ class SquidbackCommonProcess {
     // intended to implement gui options to enable/disable graphs
     draw() {
         const smooth = 0.5;
-        this.minVisualDb = -120;//smooth * this.minVisualDb + (1-smooth)*(this.anal.minDb * 1.01);
-        this.maxVisualDb = -10;//smooth * this.maxVisualDb + (1-smooth)*(this.anal.maxDb + 10);
+        this.minVisualDb = -100;//smooth * this.minVisualDb + (1-smooth)*(this.anal.minDb * 1.01);
+        this.maxVisualDb = -5;//smooth * this.maxVisualDb + (1-smooth)*(this.anal.maxDb + 10);
         const drawOptions = {
             minDb: this.minVisualDb, maxDb: this.maxVisualDb
         };

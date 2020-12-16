@@ -64,9 +64,13 @@ class NotchFilterBank {
         return output
     }
 
-    setGains(gains) {
+    setGains(gains, gains2) {
         gains.forEach((g,n)=>{
-            this.filters[n].gain.value = g
+            var gain = g + gains2[n];
+            if(gain != this.filters[n].gain.value) {
+                this.filters[n].gain.cancelScheduledValues(this.audioContext.currentTime);
+                this.filters[n].gain.setValueAtTime(gain, this.audioContext.currentTime);
+            }
         })
     }
 

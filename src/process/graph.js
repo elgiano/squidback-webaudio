@@ -40,6 +40,38 @@ class SquidbackGraph {
         canvasCtx.fill();
     }
 
+    boxSpectrum(data, min, max, color="rgba(255,255,255,1)", inverted=false) {
+        const canvas = this.canvas;
+        const canvasCtx = this.canvasCtx;
+        canvasCtx.fillStyle = color;
+
+        let barHeight;
+        const barWidth = (canvas.width / (data.length - 1));
+        let x = 0;
+        for(let i = 0; i < (data.length - 1); i++){
+            barHeight = (data[i] - min ) / (max-min) * canvas.height;
+            canvasCtx.fillRect(x, canvas.height-barHeight, barWidth, barHeight);
+            x += barWidth;
+        }
+    }
+
+    boxFilters(data, min, max, color="rgba(255,255,255,1)", inverted=false) {
+        const canvas = this.canvas;
+        const canvasCtx = this.canvasCtx;
+        canvasCtx.fillStyle = color;
+        console.log(data)
+
+        let barHeight;
+        const barWidth = (canvas.width / (data.length - 1));
+        let x = 0;
+        for(let i = 0; i < (data.length - 1); i++){
+            const val =  20 * Math.log10(data[i]);
+            barHeight = (val - min ) / (max-min) * canvas.height;
+            canvasCtx.fillRect(x, 0, barWidth, canvas.height - barHeight);
+            x += barWidth;
+        }
+    }
+
     drawFreqFFT(data, min, max, color="rgba(255,255,255,0.5)", cacheId, fill=true, inverted = false) {
         const canvas = this.canvas; const canvasCtx = this.canvasCtx
 
@@ -69,7 +101,7 @@ class SquidbackGraph {
         }
     }
 
-    drawSmoothCQDB(data, min, max, color="rgba(255,255,255,0.5)",  freqs, upsample = 3, inverted = false) {
+    drawSmoothCQDB(data, min, max, color="rgba(255,255,255,0.5)", upsample = 3, inverted = false) {
         const canvas = this.canvas;
         const canvasCtx = this.canvasCtx;
 

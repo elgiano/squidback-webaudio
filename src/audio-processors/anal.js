@@ -122,7 +122,7 @@ class MagnitudesHistory {
         //this.mel = new MelRebin(sampleRate, fftSize, octaveDivisions, minFreq, maxFreq);
         //this.numFilters = this.mel.freqs.length;
         this.melMagDb = new Float32Array(this.numFilters)
-        this.avgThr = 0.5;
+        this.avgThr = 0;
 
         this.historySize = 50;
         this.msd = new MSD(this.numFilters, this.historySize);
@@ -132,10 +132,10 @@ class MagnitudesHistory {
         this.peakFinder = new PeakFinder(this.maxPeaks, this.numFilters)*/
 
         this.magReductions = new Float32Array(this.numFilters);
-        this.correctionSmoothing = 1-1e-3;//-3;
+        this.correctionSmoothing = 0;//-3;
         this.maxCorrection = -80;
         this.correctionMemory = new Float32Array(this.numFilters);
-        this.correctionMemoryFactor = 1e-3;
+        this.correctionMemoryFactor = 1e-4;
     }
 
     analyseSpectrum(buffer, minDb, maxDb) {
@@ -170,13 +170,13 @@ class MagnitudesHistory {
         //console.log(slopes)
         const slopeScore = this.msd.slopeScores[bin];
         const slope = this.msd.slopes[bin]
-        if(correction < 0){
+        if (correction < 0) {
             /*if(slope < -1)
                 correction *= -2
             else if(slope > 1)
                 correction *= 0.01*/
-            if(slopeScore > 5) correction *= 0.1
-            else if(slopeScore < -5)  correction *= -1.5
+            if(slopeScore > 5) correction *= 0.5;//0.1
+            else if(slopeScore < -5)  correction *= -0.5
             /*if(slopes[0] < -1 && slopes[1] < -1)
                 correction *= -2
             else if(!(slopes[1] < 1 && slopes[1] > -1 && slopes[0] < 1))
@@ -188,7 +188,7 @@ class MagnitudesHistory {
 
        if(correction < 0 ){
             this.magReductions[bin] = correction ;
-            this.correctionMemory[bin] += (correction - this.magReductions[bin]) * this.correctionMemoryFactor;
+            this.correctionMemory[bin] += correction * this.correctionMemoryFactor;
         } else {
             this.magReductions[bin] = 0;
         }
@@ -198,10 +198,12 @@ class MagnitudesHistory {
         const minCorrectionAmp = 1/ampBaseline;
         const minCorrection = ampdb(minCorrectionAmp);
         //console.log(ampBaseline, minCorrectionAmp, minCorrection)
-        const memBaseline = Math.max(...this.correctionMemory);
+        const memBaseline = -Math.max(...this.correctionMemory);
         for(const bin in this.magReductions) {
-            this.magReductions[bin] += minCorrection + this.correctionMemory[bin] + memBaseline;
+            this.magReductions[bin] += minCorrection;
+            this.correctionMemory[bin] += memBaseline;
             if(this.magReductions[bin] > 0) this.magReductions[bin] = 0
+            if(this.correctionMemory[bin] > 0) this.correctionMemory[bin] = 0
         }
     }
 
