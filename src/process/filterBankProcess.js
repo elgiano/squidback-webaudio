@@ -8,7 +8,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
         this.drawFunctions = [
             'drawColorBg',
             'drawGain',
-            //'drawSlopes',
+            'drawSlopes',
 
             'drawMelInput',
             //'drawOutputSpectrumForFilterFreqs',
@@ -87,7 +87,7 @@ class SquidbackFilterBankProcess extends SquidbackCommonProcess {
 
     drawSlopes(opts) {
         //console.log(this.anal.msd.slopes)
-        this.graph.drawLine(this.anal.msd.slopes,  -100, 100, "rgba(0,0,0,0.5)")
+        //this.graph.drawLine(this.anal.msd.slopes,  -100, 100, "rgba(0,0,0,0.5)")
         this.graph.drawGrayscaleVerticals(this.anal.msd.slopes,  0.01)
     }
 

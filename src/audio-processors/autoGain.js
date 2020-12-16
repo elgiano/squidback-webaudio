@@ -1,7 +1,7 @@
 class AutoGain {
     constructor(audioContext) {
         this.gainIncrement = 0.05 / 100;
-        this.gainDecrement = 0.05 / 100;
+        this.gainDecrement = 0.05 / 200;
         this.desiredLevel = -40;
         this.tolerance = 5;
         this.maxGain = 20;
@@ -9,7 +9,7 @@ class AutoGain {
 
         this.gain = audioContext.createGain();
         this.limiter = audioContext.createDynamicsCompressor()
-        this.limiter.threshold.value = -40
+        this.limiter.threshold.value = 0
         this.limiter.ratio.value = 20
         this.limiter.attack.value = 0.001
         this.limiter.release.value = 0.01

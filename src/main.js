@@ -18,12 +18,7 @@ async function init(online=false) {
     let process = new SquidbackFilterBankProcess(audioContext, document.querySelector("canvas#spectrum"));
     await process.start(2048)
 
-    if (online) {
-        let remote = new RemoteStream(audioContext);
-        remote.connect(process.output, process.input, "squidback", ()=>{
-            updateRemoteGui(remote)
-        }) 
-    }
+    if (online) startRemote(process)
 
     window.addEventListener('resize', ()=>{
         resizeAllCanvas();
@@ -32,6 +27,14 @@ async function init(online=false) {
 
     // let process = new SquidbackFFTProcess(audioContext);
     // await process.start(512)
+}
+
+function startRemote(process) {
+    let remote = new RemoteStream(process.audioContext);
+    remote.connect(process.input, process.output, "squidback", ()=>{
+        updateRemoteGui(remote)
+    });
+    updateRemoteGui(remote)
 }
 
 
@@ -61,6 +64,24 @@ function updateRemoteGui(remote) {
     setTimeout(()=>container.classList.remove("visible"), 2500)
 }
 
+function tryWakeLock() {
+    // The wake lock sentinel.
+    let wakeLock = null;
+
+    // Function that attempts to request a wake lock.
+    const requestWakeLock = async () => {
+      try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => {
+          console.log('Wake Lock was released');
+        });
+        console.log('Wake Lock is active');
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    };
+}
+
 window.addEventListener('load', ()=>{
     const button = document.querySelector("button#start")
     button.addEventListener("click", async ()=>{
@@ -69,4 +90,5 @@ window.addEventListener('load', ()=>{
         document.body.requestFullscreen()
     });
     resizeAllCanvas();
+    tryWakeLock();
 })

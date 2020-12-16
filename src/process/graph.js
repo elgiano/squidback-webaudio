@@ -77,7 +77,7 @@ class SquidbackGraph {
         let barHeight;
         data = new Spline([...data.keys()], data);
         canvasCtx.beginPath();
-        canvasCtx.moveTo(0, 0);
+        canvasCtx.moveTo(0, -1);
         let x = 0;
         let val =  20 * Math.log10(data.at(0));
         barHeight = (val - min) / (max-min) * canvas.height;
@@ -91,7 +91,7 @@ class SquidbackGraph {
             //canvasCtx.fillRect(x, 0, 0.1, canvas.height);
         }
         canvasCtx.lineTo(canvas.width, canvas.height-barHeight);
-        canvasCtx.lineTo(canvas.width, 0)
+        canvasCtx.lineTo(canvas.width, -1)
         canvasCtx.closePath();
         canvasCtx.fillStyle = color
         canvasCtx.fill();

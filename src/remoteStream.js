@@ -72,7 +72,7 @@ class RemoteStream {
 
     adjustVolumes() {
         const numStreams = Object.values(this.streams).length + 1;
-        const newVolume = 0.1 / Math.sqrt(numStreams);
+        const newVolume = 0.5 / Math.sqrt(numStreams);
 
         for(const streamID in this.streams) {
             console.log("[webrtc] mixing", streamID, newVolume)
