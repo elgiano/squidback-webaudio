@@ -2,7 +2,7 @@ class AutoGain {
     constructor(audioContext) {
         this.gainIncrement = 0.05 / 50;
         this.gainDecrement = 0.05 / 100;
-        this.desiredLevel = -10;
+        this.desiredLevel = -15;
         this.tolerance = 5;
         this.maxGain = 20;
         this.minGain = -20;

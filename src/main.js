@@ -31,7 +31,7 @@ async function init(online=false) {
 
 function startRemote(process) {
     let remote = new RemoteStream(process.audioContext);
-    remote.connect(process.input, process.output, "squidback", ()=>{
+    remote.connect(process.output, process.input, "squidback", ()=>{
         updateRemoteGui(remote)
     });
     updateRemoteGui(remote)

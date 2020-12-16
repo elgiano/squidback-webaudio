@@ -49,11 +49,11 @@ class RemoteStream {
         this.streamSource = this.audioContext.createMediaStreamSource(stream);
         const gain = this.audioContext.createGain();
         gain.gain.value = 1
-        this.streamSource.connect(gain).connect(this.destination);
         this.streams[streamid] = gain;
         console.log("[webrtc] connecting", this.connection, stream, mediaElement)
         document.body.appendChild(mediaElement)
         this.adjustVolumes();
+        this.streamSource.connect(gain).connect(this.destination);
     }
 
     disconnectStream(streamid) {
