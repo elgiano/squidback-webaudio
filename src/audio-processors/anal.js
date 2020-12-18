@@ -151,17 +151,17 @@ class MagnitudesHistory {
         if(this.peakThr < this.minPeakThr) this.peakThr = this.minPeakThr;
 
         /*this.peakFinder.findPeaks(this.melMagDb, (peakIndex)=>
-            this.correctMagnitude(peakIndex)
+            this.calcMagReduction(peakIndex)
         );*/
 
         this.msd.analyzeSpectrum(this.melMagDb);
 
         for(let bin = 0; bin < this.melMagDb.length; bin++) {
-            this.correctMagnitude(bin)
+            this.calcMagReduction(bin)
         }
     }
 
-    correctMagnitude(bin) {
+    calcMagReduction(bin) {
         //this.magReductions[bin] += (this.peakThr - this.magDb[bin]) / 2
         let correction = (this.peakThr - this.melMagDb[bin]);// * this.peakFinder.peakPersistence[bin];// * 2;
         // console.log(correction, this.peakThr, this.melMagDb[bin])
@@ -169,7 +169,7 @@ class MagnitudesHistory {
         //const slopes = this.msd.getSlopes(bin);
         //console.log(slopes)
         const slopeScore = this.msd.slopeScores[bin];
-        const slope = this.msd.slopes[bin]
+        //const slope = this.msd.slopes[bin]
         if (correction < 0) {
             /*if(slope < -1)
                 correction *= -2
