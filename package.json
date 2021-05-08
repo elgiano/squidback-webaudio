@@ -7,7 +7,7 @@
     "build": "browserify src/main.js -o www/main.js",
     "watch": "watchify src/main.js -o www/main.js --debug --verbose ",
     "start": "http-server www -a 0.0.0.0 -S",
-    "start-server": "cd node_modules/rtcmulticonnection-server; forever start server.js",
+    "start-server": "forever start server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -26,6 +26,7 @@
     "http-server": "^0.12.1",
     "rtcmulticonnection": "^3.7.0",
     "rtcmulticonnection-server": "^1.3.2",
+    "socket.io": "^2.4.1",
     "socket.io-client": "^2.2.0",
     "standardized-audio-context": "^25.1.6"
   },
