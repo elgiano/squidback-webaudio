@@ -87,9 +87,12 @@ function tryWakeLock() {
 
 window.addEventListener('load', ()=>{
     const button = document.querySelector("button#start")
+    const intro = document.querySelector("div#intro")
     button.addEventListener("click", async ()=>{
-        await init(true);
+        const online = document.getElementsByName("online")[0].checked;
+        await init(online);
         button.classList.add("started")
+        intro.classList.add("started")
         document.body.requestFullscreen()
     });
     resizeAllCanvas();

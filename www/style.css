@@ -51,19 +51,55 @@ canvas {
     font-weight: bold;
 }
 
-button#start {
+div#intro {
     padding: 1em;
     position: absolute;
     width: 100%;
     height: 100vh;
-    background: #111; color: white;
-    font-size: 2em;
+    overflow: auto;
+    background: #faf; color: #9a4e9a;
     border: 0;
 }
+div#intro > * {
+    display: block;
+    max-width: 100%;
+    width: 50rem;
+    margin: 1em auto;
+}
 
-button#start.started {
+div#intro h2, div#intro h3 { color: #fff }
+div#intro h2 { font-size: 2em; font-weight: normal; margin-bottom: 0}
+div#intro h3 { font-size: 1em; font-weight: normal; margin-top: 0}
+div#intro input[type=checkbox] { width: 2em; height: 2em; margin-right: 1em}
+
+div#onlineCheckbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
+    border-radius: 0.25em;
+}
+button#start {
+    /*padding: 1em;
+    position: absolute;
+    width: 100%;
+    height: 100vh;*/
+    width: auto;
+    padding: 0.5em 1em;
+    background: #cf404f; color: white;
+    border-radius: 0.5em;
+    font-size: 2em;
+    border: 0;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+button#start.started, div#intro.started {
     display: none
 }
+
+p.description { font-size: 0.8em; font-style: italic }
+.warning { color: #c52929; text-align: center }
 
 #remoteGui {
     position: absolute;

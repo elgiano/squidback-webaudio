@@ -23,7 +23,26 @@
     <noscript>Sorry, squidback doesnt't work without Javascript. Please make sure you have it enabled.</noscript>
     <main class="wrapper">
         <div id="no-worklet" style="display: none;">Audio Worklet API not supported by you browser, try a recent Chrome version.</div>
-        <button id="start">START</button>
+        <div id="intro">
+            <h2>squidback.xyz</h2>
+            <h3>web-based Larsen generator</h3>
+
+            <p class="description">
+            Most spaces and audio system have resonant frequencies: Larsen effect is a continuous reinforcement of these frequencies, that makes them (very) audible.
+            As such, it is reactive to the distance between speakers and microphones, to the architecture of the place where the system is situated, and to bodies inhabiting it.
+            Squidback is a self-regulating system, that strives to generate a variety of feedback tones, while staying reactive to its environment.
+            </p>
+
+            <span class="warning">Feedbacks can be loud, check your volume.</span><br/>
+
+            <button id="start">START</button>
+
+            <div id="onlineCheckbox">
+                <input type="checkbox" name="online" value="" /> Share sound with all other connected players
+            </div>
+
+
+        </div>
         <canvas id="spectrum"></canvas>
         <div id="remoteGui">
             <span id="remoteStatus"></span>
