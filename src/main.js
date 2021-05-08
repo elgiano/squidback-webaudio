@@ -98,3 +98,5 @@ window.addEventListener('load', ()=>{
     resizeAllCanvas();
     tryWakeLock();
 })
+
+document.querySelector("div#intro").classList.remove("loading")

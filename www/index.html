@@ -23,7 +23,7 @@
     <noscript>Sorry, squidback doesnt't work without Javascript. Please make sure you have it enabled.</noscript>
     <main class="wrapper">
         <div id="no-worklet" style="display: none;">Audio Worklet API not supported by you browser, try a recent Chrome version.</div>
-        <div id="intro">
+        <div id="intro" class="loading">
             <h2>squidback.xyz</h2>
             <h3>web-based Larsen generator</h3>
 
@@ -36,6 +36,7 @@
             <span class="warning">Feedbacks can be loud, check your volume.</span><br/>
 
             <button id="start">START</button>
+            <button id="loading">Loading...</button>
 
             <div id="onlineCheckbox">
                 <input type="checkbox" name="online" value="" /> Share sound with all other connected players

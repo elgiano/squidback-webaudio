@@ -59,6 +59,7 @@ div#intro {
     overflow: auto;
     background: #faf; color: #9a4e9a;
     border: 0;
+    opacity: 1;
 }
 div#intro > * {
     display: block;
@@ -70,7 +71,9 @@ div#intro > * {
 div#intro h2, div#intro h3 { color: #fff }
 div#intro h2 { font-size: 2em; font-weight: normal; margin-bottom: 0}
 div#intro h3 { font-size: 1em; font-weight: normal; margin-top: 0}
-div#intro input[type=checkbox] { width: 2em; height: 2em; margin-right: 1em}
+
+p.description { font-size: 0.8em; font-style: italic }
+.warning { color: #c52929; text-align: center }
 
 div#onlineCheckbox {
     display: flex;
@@ -79,6 +82,9 @@ div#onlineCheckbox {
     padding: 0.5em;
     border-radius: 0.25em;
 }
+div#onlineCheckbox input[type=checkbox] { width: 2em; height: 2em; margin-right: 1em}
+
+
 button#start {
     /*padding: 1em;
     position: absolute;
@@ -95,11 +101,26 @@ button#start {
 }
 
 button#start.started, div#intro.started {
-    display: none
+    transition: 1s opacity ease-in;
+    opacity: 0;
+    pointer-events: none;
 }
-
-p.description { font-size: 0.8em; font-style: italic }
-.warning { color: #c52929; text-align: center }
+button#loading {
+    /*padding: 1em;
+    position: absolute;
+    width: 100%;
+    height: 100vh;*/
+    display: none;
+    width: auto;
+    padding: 0.5em 1em;
+    background: inherit; color: white;
+    border-radius: 0.5em;
+    font-size: 2em;
+    border: 0;
+    margin: 0 auto;
+}
+#intro.loading button#start { display: none }
+#intro.loading button#loading { display: block }
 
 #remoteGui {
     position: absolute;
